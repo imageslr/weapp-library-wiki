@@ -15,5 +15,8 @@ export default new Router({
         path: '/search',
         component: Layout,
         children: [{ path: '', component: Search }]
+    }, {
+        path: '/book/:id',
+        name: 'book',
     }]
 })

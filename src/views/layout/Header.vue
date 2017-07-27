@@ -50,7 +50,9 @@ export default {
     },
     watch: {
         '$route': function() {
-            this.inputValue = '';
+            // 切换页面时清空输入框
+            if(this.$route.path != '/search' || this.$route.query.keyword != this.inputValue)
+                this.inputValue = '';  
         }
     },
     computed: {
@@ -70,7 +72,7 @@ export default {
                 path: 'search',
                 query: {
                     type: this.selectedType,
-                    key: this.inputValue
+                    keyword: this.inputValue
                 }
             });
         }
@@ -105,7 +107,7 @@ export default {
 .header-search {
     position: relative;
     display: table-cell;
-    width: 185px;
+    width: 220px;
     height: 60px;
     vertical-align: middle;
 }

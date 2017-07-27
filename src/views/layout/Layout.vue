@@ -2,8 +2,10 @@
     <div>
         <app-head></app-head>
         <transition name="fade" mode="out-in">
-            <router-view>
-            </router-view>
+            <div class="main">
+                <router-view>
+                </router-view>
+            </div>
         </transition>
     </div>
 </template>
@@ -16,6 +18,12 @@ export default {
 }
 </script>
 <style scoped>
+.main {
+    width: 100%;
+    padding: 40px;
+    box-sizing: border-box;
+}
+
 .fade-enter-active,
 .fade-leave-active {
     transition: opacity .3s
