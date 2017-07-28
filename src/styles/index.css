@@ -1,3 +1,7 @@
+* {
+    box-sizing: border-box;
+}
+
 html,
 body {
     width: 100%;
@@ -7,6 +11,7 @@ body {
 body {
     margin: 0;
     padding: 0;
+    min-width: 950px;
     /*font-family: PingFangSC-Light, 'helvetica neue', 'hiragino sans gb', arial, 'microsoft yahei ui', 'microsoft yahei', simsun, sans-serif;*/
 }
 
@@ -14,11 +19,34 @@ a {
     color: #3377aa;
     text-decoration: none;
 }
+
 a:hover,
 a:active {
     color: #20a0ff;
 }
 
+/* layout */
+
+.main {
+    width: 950px;
+    margin: 0 auto;
+    padding: 40px 0;
+}
+
+.left-6 {
+    float: left;
+    width: 60%;
+}
+
+.right-4 {
+    float: right;
+    width: 40%;
+    padding-left: 40px;
+}
+
+.clearfix {
+    clear: both;
+}
 
 /* 覆盖element-ui */
 
@@ -27,24 +55,3 @@ a:active {
     background-color: #323840;
 }
 
-.header-search__input .el-input-group__prepend,
-.header-search__input .el-input__inner {
-    background-color: #fff;
-    border: 0;
-}
-
-.header-search__input .el-input__inner {
-    border-left: 1px solid #bfcbd9;
-    padding-right: 0;
-    transition: width 0.15s ease;
-    -webkit-transition: width 0.15s ease;
-    -moz-transition: width 0.15s ease;
-}
-
-.header-search__input .el-input__inner:focus {
-    width: 300px;
-}
-
-.header-search__input .el-select .el-input {
-    width: 70px;
-}

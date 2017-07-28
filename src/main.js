@@ -11,7 +11,9 @@ require('promise.prototype.finally').shim();
 Vue.use(ElementUI);
 
 router.beforeEach((to, from, next) => {
-    NProgress.start(); // 开启Progress
+    if(to.path !== from.path){
+        NProgress.start(); // 开启Progress
+    }
     next();
 });
 

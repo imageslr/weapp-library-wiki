@@ -69,10 +69,11 @@ export default {
     methods: {
         onSubmit: function() {
             this.$router.push({
-                path: 'search',
+                path: '/search',
                 query: {
                     type: this.selectedType,
-                    keyword: this.inputValue
+                    keyword: this.inputValue,
+                    t: Date.now()   // 添加此参数使得每次按下回车时，都会触发route的变化
                 }
             });
         }
@@ -129,5 +130,29 @@ export default {
     color: #fff;
     cursor: pointer;
     font-size: 14px;
+}
+</style>
+
+<style>
+.header-search__input .el-input-group__prepend,
+.header-search__input .el-input__inner {
+    background-color: #fff;
+    border: 0;
+}
+
+.header-search__input .el-input__inner {
+    border-left: 1px solid #bfcbd9;
+    padding-right: 0;
+    transition: width 0.15s ease;
+    -webkit-transition: width 0.15s ease;
+    -moz-transition: width 0.15s ease;
+}
+
+.header-search__input .el-input__inner:focus {
+    width: 300px;
+}
+
+.header-search__input .el-select .el-input {
+    width: 70px;
 }
 </style>

@@ -5,3 +5,7 @@ export function search(params) {
         params: params
     })
 }
+
+export function getBookById(id){
+    return fetch.get('/api/wiki/books/' + id)
+}

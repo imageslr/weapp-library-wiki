@@ -1,32 +1,33 @@
 <template>
-    <div class="wrap">
-        <div style="width: 60%">
-            <div v-loading="loading">
-                <template v-if="books.length">
-                    <div class="text-smaller">
-                        搜索结果{{start + 1}} - {{end}} 共{{total}}
-                    </div>
-                    <div v-for="book in books" class="book-item">
-                        <div class="book-item-picture">
-                            <router-link :to="{ name: 'book', params: { id: book.id }}"><img :src="book.imageUrl" /></router-link>
-                        </div>
-                        <div class="book-item-info">
-                            <div>
-                                <router-link :to="{ name: 'book', params: { id: book.id }}" class="book-item-info__title"> {{ book.title }} </router-link>
-                            </div>
-                            <div>作者：{{book.author}}</div>
-                            <div>出版社：{{book.publisher}}</div>
-                            <div>出版时间：{{book.pubdate}}</div>
-                            <div>ISBN：{{book.isbn}}</div>
-                        </div>
-                    </div>
-                    <el-pagination layout="prev, pager, next" :total="total" :page-size="pageSize" :current-page.sync="currentPage" @current-change="fetchData">
-                    </el-pagination>
-                </template>
-                <div v-if="!books.length && !loading" class="el-table__empty-block">
-                    <span class="el-table__empty-text">暂无数据</span>
+    <div>
+        <div class="left-6" v-loading="loading">
+            <template v-if="books.length">
+                <div class="text-smaller">
+                    搜索结果{{start + 1}} - {{end}} 共{{total}}本
                 </div>
+                <div v-for="book in books" class="book-item">
+                    <div class="book-item-picture">
+                        <router-link :to="{ name: 'book', params: { id: book.id }}"><img :src="book.imageUrl" /></router-link>
+                    </div>
+                    <div class="book-item-info">
+                        <div>
+                            <router-link :to="{ name: 'book', params: { id: book.id }}" class="book-item-info__title"> {{ book.title }} </router-link>
+                        </div>
+                        <div>作者：{{book.author}}</div>
+                        <div>出版社：{{book.publisher}}</div>
+                        <div>出版时间：{{book.pubdate}}</div>
+                        <div>ISBN：{{book.isbn}}</div>
+                    </div>
+                </div>
+                <el-pagination layout="prev, pager, next" :total="total" :page-size="pageSize" :current-page.sync="currentPage" @current-change="fetchData">
+                </el-pagination>
+            </template>
+            <div v-if="!books.length && !loading" class="el-table__empty-block">
+                <span class="el-table__empty-text">暂无数据</span>
             </div>
+        </div>
+        <div class="right-4">
+            <el-card></el-card>
         </div>
     </div>
 </template>
@@ -40,7 +41,7 @@ export default {
             total: 0,
             pageSize: 10,
             currentPage: 1,
-            loading: true,
+            loading: true
         }
     },
     computed: {
@@ -56,7 +57,6 @@ export default {
     },
     watch: {
         '$route': function() {
-            console.log(this.$route.query);
             if (this.currentPage == 1)
                 this.fetchData(1);
             else
@@ -65,6 +65,12 @@ export default {
     },
     methods: {
         fetchData: function(page) {
+            if(!this.$route.query.keyword) {
+                this.books = [];
+                this.loading = false;
+                return;
+            }
+
             this.books = [];
             this.loading = true;
 
@@ -80,19 +86,11 @@ export default {
             }).finally(() => {
                 this.loading = false;
             });
-        },
-        navigate: function(row, event) {
-            console.log(row);
-            console.log(event);
         }
     }
 }
 </script>
 <style scoped>
-.wrap {
-    width: 950px;
-    margin: 0 auto;
-}
 
 .text-smaller {
     margin-bottom: 5px;
