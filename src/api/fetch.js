@@ -36,8 +36,9 @@ service.interceptors.response.use(
     },
     error => {
         console.log('err' + error); // for debug
+        let msg = error.response.status == '504' ? '网络超时' : error.message;
         Message({
-            message: error.message,
+            message: msg,
             type: 'error',
             duration: 5 * 1000
         });

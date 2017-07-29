@@ -1,7 +1,7 @@
 <template>
     <el-menu class="wrap" theme="dark">
         <div class="header">
-            <router-link to="/" class="header-logo">图书Wiki系统</router-link>
+            <router-link to="/" class="header-logo">图书WIKI系统</router-link>
             <div class="header-search">
                 <el-input @keyup.native.enter="onSubmit" class="header-search__input" size="small" placeholder="搜索" v-model="inputValue">
                     <el-select v-model="selectedType" slot="prepend" placeholder="请选择">
@@ -21,7 +21,7 @@
                         <el-dropdown-item command="loginout" divided>退出</el-dropdown-item>
                     </el-dropdown-menu>
                 </el-dropdown>
-                <span v-else class="header-action__link">登录 / 注册</span>
+                <router-link v-else class="header-action__link" to="/login" >登录 / 注册</router-link>
             </div>
         </div>
     </el-menu>
@@ -73,6 +73,7 @@ export default {
                 query: {
                     type: this.selectedType,
                     keyword: this.inputValue,
+                    p: 1,
                     t: Date.now()   // 添加此参数使得每次按下回车时，都会触发route的变化
                 }
             });

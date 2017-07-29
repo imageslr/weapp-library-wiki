@@ -19,7 +19,7 @@
                         <div>ISBN：{{book.isbn}}</div>
                     </div>
                 </div>
-                <el-pagination layout="prev, pager, next" :total="total" :page-size="pageSize" :current-page.sync="currentPage" @current-change="fetchData">
+                <el-pagination layout="prev, pager, next" :total="total" :page-size="pageSize" :current-page.sync="currentPage" @current-change="navigate">
                 </el-pagination>
             </template>
             <div v-if="!books.length && !loading" class="el-table__empty-block">
@@ -53,19 +53,12 @@ export default {
         }
     },
     created() {
-        this.fetchData(1);
-    },
-    watch: {
-        '$route': function() {
-            if (this.currentPage == 1)
-                this.fetchData(1);
-            else
-                this.currentPage = 1;
-        }
+        this.currentPage = parseInt(this.$route.query.p);
+        this.fetchData();
     },
     methods: {
-        fetchData: function(page) {
-            if(!this.$route.query.keyword) {
+        fetchData: function() {
+            if (!this.$route.query.keyword) {
                 this.books = [];
                 this.loading = false;
                 return;
@@ -86,12 +79,21 @@ export default {
             }).finally(() => {
                 this.loading = false;
             });
+        },
+        navigate: function(page) {
+            this.$router.push({
+                path: '/search',
+                query: {
+                    type: this.$route.query.type,
+                    keyword: this.$route.query.keyword,
+                    p: page
+                }
+            })
         }
     }
 }
 </script>
 <style scoped>
-
 .text-smaller {
     margin-bottom: 5px;
     text-align: right;
