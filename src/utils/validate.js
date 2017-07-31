@@ -16,7 +16,7 @@ export const integerValidator = (rule, value, callback) => {
 
 export const phoneValidator = (rule, value, callback) => {
     if (!(/^1[34578]\d{9}$/.test(value))) {
-        callback(new Error('手机号格式错误'));
+        callback(new Error('请输入正确的手机号'));
     } else {
         callback();
     }
@@ -37,3 +37,11 @@ export const passwordValidator = (rule, value, callback) => {
         callback();
     }
 };
+
+export const emailTest = (value) => {
+    return /^[a-z0-9](?:[-_.+]?[a-z0-9]+)*@[a-z0-9]+\.com$/i.test(value);
+}
+
+export const phoneTest = (value) => {
+    return /^1[34578]\d{9}$/.test(value);
+}

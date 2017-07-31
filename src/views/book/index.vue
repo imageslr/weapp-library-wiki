@@ -30,6 +30,17 @@
                             </div>
                         </div>
                     </div>
+                    <h2>包含这本书的书单</h2>
+                    <div v-if="!book.relevantBooklists.length">暂无</div>
+                    <div v-else>
+                        <div v-for="item in book.relevantBooklists" class="relevant-booklist-item">
+                            <div class="relevant-book-item__img-wrap">
+                                <!-- 添加t参数以保证触发create钩子 -->
+                                <img :src="item.imageUrl" @click="$refs.qrDialog.show()"/>
+                            </div>
+                            <div @click="$refs.qrDialog.show()"><a>{{item.title}}</a></div>
+                        </div>
+                    </div>
                 </div>
             </template>
             <div v-if="!book && !loading" class="el-table__empty-block">
@@ -44,12 +55,17 @@
                 </div>
             </el-card>
         </div>
+        <qr-dialog ref="qrDialog"></qr-dialog>
     </div>
 </template>
 <script>
 import { getBookById } from '../../api/index.js';
+import qrDialog from '../../components/QRDialog.vue';
 
 export default {
+    components: {
+        qrDialog
+    },
     data() {
         return {
             book: undefined,
@@ -171,14 +187,11 @@ h2 {
 }
 
 .relevant-book {
-    display: flex;
-    display: -webkit-flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: space-between;
+    overflow: hidden;
 }
 
 .relevant-book-item {
+    float: left;
     width: 20%;
     padding-right: 30px;
     margin: 15px 0;
@@ -194,5 +207,18 @@ h2 {
 .relevant-book-item__img-wrap img {
     max-width: 100%;
     max-height: 100%;
+}
+
+.relevant-booklist-item {
+    float: left;
+    width: 20%;
+    padding-right: 30px;
+    margin: 15px 0;
+    overflow: hidden;
+    text-align: center;
+}
+
+.relevant-booklist-item > div {
+    cursor: pointer;
 }
 </style>

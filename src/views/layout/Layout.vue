@@ -1,9 +1,9 @@
 <template>
     <div class="container">
-        <app-head></app-head>
+        <app-head ref="header"></app-head>
         <transition name="fade" mode="out-in">
             <div class="main">
-                <router-view :key="$route.fullPath"></router-view>
+                <router-view :key="$route.fullPath" v-on:showLogin="$refs.header.showLogin()"></router-view>
             </div>
         </transition>
     </div>

@@ -7,7 +7,7 @@
                 <h3>什么是维基</h3>
                 <p>维基（Wiki）是一种用来构建自由内容、公开编辑的网络百科协作项目的技术，它使得包括您在内的所有人都可以简单地使用网页浏览器浏览查看和修改其中的内容。</p>
                 <h3>图书WIKI系统简介</h3>
-                <p>此系统基于Wiki技术构建，主要提供<span>“无微不至”的借阅伴侣</span>所使用的图书信息的协作管理功能。您可通过多种方式<router-link to="/login">登录</router-link>系统。</p>
+                <p>此系统基于Wiki技术构建，主要提供<span @click="$refs.qrDialog.show()">“无微不至”的借阅伴侣</span>所使用的图书信息的协作管理功能。您可通过多种方式<a @click="showLogin()">登录</a>系统。</p>
                 <p>您可使用搜索功能搜索并查看某本图书的详细信息，在登录后可以创建或编辑某本图书的详细信息。在一些情况下为了避免扰乱或者破坏可能会限制编辑功能。</p>
                 <p>任何人都可以成为图书条目的作者，作者的昵称将永久显示在该条目页中以示感激。也可在遵守协议并标示来源后直接复制、使用以及发布这些内容。</p>
             </el-tab-pane>
@@ -25,6 +25,8 @@
                 <p>每次提交前，请为本次提交设置一个简短清晰的编辑描述，以便其他人能够知道您作出了什么修改。</p>
                 <h3>5. 查看最新版本</h3>
                 <p>完成提交后，您编辑的内容将成为该条目的最新版本。</p>
+                <h3>6. 其他</h3>
+                <p>点击左上角“图书WIKI系统”，可返回主页。</p>
             </el-tab-pane>
             <el-tab-pane label="百科理念">
                 <h3>真实</h3>
@@ -41,12 +43,17 @@
                 <p>每个图书信息最初都会创建为一个初始版本；当图书信息被修改后，旧的内容不会消失，而是保存为一个历史版本。用户可浏览不同的版本的图书信息。</p>
             </el-tab-pane>
         </el-tabs>
+        <qr-dialog ref="qrDialog"></qr-dialog>
     </div>
 </template>
 <script>
 import 'particles.js/particles';
+import qrDialog from '../../components/QRDialog.vue';
 const particlesJS = window.particlesJS;
 export default {
+    components: {
+        qrDialog
+    },
     data() {
         return {
             particlesCfg: {
@@ -158,6 +165,11 @@ export default {
     },
     mounted() {
         particlesJS("particles-js", this.particlesCfg);
+    },
+    methods: {
+        showLogin(){
+            this.$emit('showLogin')
+        }
     }
 }
 </script>

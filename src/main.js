@@ -11,10 +11,16 @@ require('promise.prototype.finally').shim();
 Vue.use(ElementUI);
 
 router.beforeEach((to, from, next) => {
-    if(to.path !== from.path){
-        NProgress.start(); // 开启Progress
+    NProgress.start();
+
+    // 如果已经登录且没有获取用户信息，则获取用户信息
+    if (store.getters.token && store.getters.id == '') {
+        store.dispatch('GET_INFO').finally(() => {
+            next(); // hack方法 确保addRoutes已完成
+        });
+    } else {
+        next();
     }
-    next();
 });
 
 router.afterEach(() => {

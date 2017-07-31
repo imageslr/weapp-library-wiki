@@ -24,11 +24,13 @@ service.interceptors.response.use(
     response => {
         const res = response.data;
         if (res.code !== 200) {
-            Message({
-                message: res.errmsg,
-                type: 'error',
-                duration: 5 * 1000
-            });
+            if (res.code == 500) {
+                Message({
+                    message: res.errmsg,
+                    type: 'error',
+                    duration: 3 * 1000
+                });
+            }
             return Promise.reject(res);
         } else {
             return res.data;
@@ -36,9 +38,9 @@ service.interceptors.response.use(
     },
     error => {
         console.log('err' + error); // for debug
-        let msg = error.response.status == '504' ? '网络超时' : error.message;
+        //console.log(error.response);
         Message({
-            message: msg,
+            message: '网络超时',
             type: 'error',
             duration: 5 * 1000
         });

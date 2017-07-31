@@ -13,7 +13,7 @@
                 <screenfull class='header-action__screenfull'></screenfull>
                 <el-dropdown v-if="token" trigger="click" @command="handleCommand">
                     <span class="header-action__link">
-                    欢迎你，{{username}} 
+                    欢迎你，{{nickname}} 
                     <i class="el-icon-setting" style="margin-left: 5px"></i>
                     </span>
                     <el-dropdown-menu slot="dropdown">
@@ -21,16 +21,20 @@
                         <el-dropdown-item command="loginout" divided>退出</el-dropdown-item>
                     </el-dropdown-menu>
                 </el-dropdown>
-                <router-link v-else class="header-action__link" to="/login" >登录 / 注册</router-link>
+                <div v-else class="header-action__link" @click="showLogin">登录 / 注册</div>
             </div>
+            <login-dialog ref="loginDialog"></login-dialog>
         </div>
     </el-menu>
 </template>
 <script>
 import screenfull from '../../components/Screenfull.vue';
+import loginDialog from './components/LoginDialog.vue';
+import { mapGetters } from 'vuex';
 export default {
     components: {
-        screenfull
+        screenfull,
+        loginDialog
     },
     data() {
         return {
@@ -45,28 +49,33 @@ export default {
                 value: 'isbn'
             }],
             selectedType: 'title',
-            inputValue: ''
+            inputValue: '',
+
+            loginDialogVisible: false
         }
     },
     watch: {
         '$route': function() {
             // 切换页面时清空输入框
-            if(this.$route.path != '/search' || this.$route.query.keyword != this.inputValue)
-                this.inputValue = '';  
+            if (this.$route.path != '/search' || this.$route.query.keyword != this.inputValue)
+                this.inputValue = '';
         }
     },
     computed: {
-        token() {
-            return false;
+        token(){
+            return this.$store.getters.token;
         },
-        username() {
-            return "管理员";
+        nickname(){
+            return this.$store.getters.nickname;
         },
         path() {
             return this.$route.path.replace('/', '');
         }
     },
     methods: {
+        showLogin: function() {
+            this.$refs.loginDialog.show();
+        },
         onSubmit: function() {
             this.$router.push({
                 path: '/search',
@@ -74,7 +83,7 @@ export default {
                     type: this.selectedType,
                     keyword: this.inputValue,
                     p: 1,
-                    t: Date.now()   // 添加此参数使得每次按下回车时，都会触发route的变化
+                    t: Date.now() // 添加此参数使得每次按下回车时，都会触发route的变化
                 }
             });
         }
@@ -83,7 +92,6 @@ export default {
 </script>
 <style scoped>
 .wrap {
-    z-index: 999;
     position: relative;
     width: 100%;
     height: 60px;
@@ -125,6 +133,7 @@ export default {
     margin-right: 10px;
 }
 
+.el-dropdown,
 .header-action__link {
     display: inline-block;
     vertical-align: top;
@@ -133,7 +142,6 @@ export default {
     font-size: 14px;
 }
 </style>
-
 <style>
 .header-search__input .el-input-group__prepend,
 .header-search__input .el-input__inner {
