@@ -18,23 +18,26 @@
                     </span>
                     <el-dropdown-menu slot="dropdown">
                         <el-dropdown-item command="changepassword">修改密码</el-dropdown-item>
-                        <el-dropdown-item command="loginout" divided>退出</el-dropdown-item>
+                        <el-dropdown-item command="logout" divided>退出</el-dropdown-item>
                     </el-dropdown-menu>
                 </el-dropdown>
                 <div v-else class="header-action__link" @click="showLogin">登录 / 注册</div>
             </div>
             <login-dialog ref="loginDialog"></login-dialog>
+            <change-password-dialog ref="changePasswordDialog"></change-password-dialog>
         </div>
     </el-menu>
 </template>
 <script>
 import screenfull from '../../components/Screenfull.vue';
 import loginDialog from './components/LoginDialog.vue';
+import changePasswordDialog from './components/ChangePasswordDialog.vue';
 import { mapGetters } from 'vuex';
 export default {
     components: {
         screenfull,
-        loginDialog
+        loginDialog,
+        changePasswordDialog
     },
     data() {
         return {
@@ -86,6 +89,14 @@ export default {
                     t: Date.now() // 添加此参数使得每次按下回车时，都会触发route的变化
                 }
             });
+        },
+        handleCommand: function(command){
+            if(command == 'logout'){
+                this.$store.dispatch('LOGOUT');
+            }
+            if(command == 'changepassword') {
+                this.$refs.changePasswordDialog.show();
+            }
         }
     }
 }

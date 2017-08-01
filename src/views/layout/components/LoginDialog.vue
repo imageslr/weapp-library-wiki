@@ -55,7 +55,8 @@ export default {
                         if (this.type == 1 && !emailTest(value)) {
                             callback(new Error('请输入正确的邮箱'));
                         } else if ((this.type == 2 || this.type == 3) && !phoneTest(value)) {
-                            callback(new Error('请输入正确的手机号'));
+                            // callback(new Error('请输入正确的手机号'));
+                            callback();     // -> 图书馆账号中有的不是手机号，所以暂时不检测
                         } else {
                             callback();
                         }
@@ -81,7 +82,7 @@ export default {
                 password: [{
                     required: true,
                     trigger: 'blur',
-                    mmessage: '请输入密码，长度6~25位'
+                    message: '请输入密码，长度6~25位'
                 }, {
                     min: 6,
                     max: 25,

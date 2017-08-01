@@ -18,8 +18,16 @@ export function login(username, password, type) {
     });
 }
 
-export function getUserInfo(token){
+export function getUserInfo(token) {
     return fetch.get('/api/wiki/users/info', {
-        params: {token}
+        params: { token }
+    });
+}
+
+export function changePassword(id, originPassword, newPassword) {
+    return fetch.post('/api/wiki/users/password', {
+        id,
+        originPassword,
+        newPassword
     });
 }
