@@ -27,13 +27,16 @@
             </div>
         </div>
         <div class="right-4">
-            <el-card></el-card>
+            <el-card>
+                <div style="margin-bottom: 10px;"><small>您可以创建系统中没有的图书条目。系统以ISBN区分图书的唯一性，您不可以创建ISBN已存在的图书条目。</small></div>
+                <el-button type="primary" @click="create">创建图书条目</el-button>
+            </el-card>
         </div>
     </div>
 </template>
 <script>
 import { search } from '../../api/index.js';
-
+import { checkLogin } from '../../utils/auth.js';
 export default {
     data() {
         return {
@@ -89,6 +92,11 @@ export default {
                     p: page
                 }
             })
+        },
+        create: function(){
+            if(checkLogin(this)) {
+                this.$router.push({path: '/create'});
+            }
         }
     }
 }

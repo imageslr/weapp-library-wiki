@@ -1,7 +1,7 @@
 export const requiredValidator = (msg) => {
     return {
         required: true,
-        message: msg,
+        message: msg ? msg : '请填写此字段',
         trigger: 'blur'
     }
 }

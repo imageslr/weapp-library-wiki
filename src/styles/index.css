@@ -27,6 +27,12 @@ a:active {
     color: #20a0ff;
 }
 
+small {
+    color: #475669;
+}
+
+
+
 /* layout */
 
 
@@ -42,10 +48,95 @@ a:active {
 }
 
 
+/* 图书详情 */
+
+.book-detail h1 {
+    word-wrap: break-word;
+    display: block;
+    font-size: 25px;
+    font-weight: bold;
+    color: #494949;
+    margin: 0;
+    padding: 0 0 15px 0;
+    line-height: 1.1;
+}
+
+.book-detail h2 {
+    margin-top: 24px;
+    margin-bottom: 3px;
+    color: #494949;
+    line-height: 150%;
+    font-size: 20px;
+}
+
+.basic-info-wrap {
+    overflow: hidden;
+    color: #111;
+    font-size: 14px;
+}
+
+.basic-info-picture {
+    float: left;
+    margin-right: 20px;
+    max-width: 100px;
+}
+
+.basic-info {
+    overflow: hidden;
+}
+
+.basic-info-picture img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.basic-info__key {
+    color: #666666;
+}
+
+.relevant-book {
+    overflow: hidden;
+}
+
+.relevant-book-item {
+    display: inline-block;
+    width: 20%;
+    padding-right: 30px;
+    margin: 15px 0;
+    overflow: hidden;
+    text-align: center;
+    vertical-align: top;
+}
+
+.relevant-book-item__img-wrap {
+    height: 130px;
+    overflow: hidden;
+}
+
+.relevant-book-item__img-wrap img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.relevant-booklist-item {
+    float: left;
+    width: 20%;
+    padding-right: 30px;
+    margin: 15px 0;
+    overflow: hidden;
+    text-align: center;
+}
+
+.relevant-booklist-item > div {
+    cursor: pointer;
+}
+
+
 /* 覆盖element-ui */
 
 .el-menu {
     border-radius: 0;
     background-color: #323840;
 }
+
 

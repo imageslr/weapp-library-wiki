@@ -13,13 +13,21 @@ Vue.use(ElementUI);
 router.beforeEach((to, from, next) => {
     NProgress.start();
 
-    // 如果已经登录且没有获取用户信息，则获取用户信息
-    if (store.getters.token && store.getters.id == '') {
-        store.dispatch('GET_INFO').finally(() => {
-            next(); // hack方法 确保addRoutes已完成
-        });
+    // 如果已经登录
+    if (store.getters.token) {
+        // 如果没有获取用户信息，则获取用户信息
+        if (store.getters.id == '') {
+            store.dispatch('GET_INFO').finally(() => {
+                next();
+            });
+        } else {
+            next();
+        }
     } else {
-        next();
+        if(to.matched.some(record => record.meta.requireAuth)) {
+            next({path: '/401'});
+        }
+        else next();
     }
 });
 

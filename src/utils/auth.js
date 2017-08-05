@@ -1,5 +1,6 @@
 import Cookies from 'js-cookie';
 
+
 const TokenKey = 'Wiki-Token';
 
 export function getToken() {
@@ -12,4 +13,12 @@ export function setToken(token) {
 
 export function removeToken() {
   return Cookies.remove(TokenKey);
+}
+
+export function checkLogin(vueInstance){
+    if(getToken()) return true;
+    else {
+        vueInstance.$emit('showLogin');
+        return false;
+    } 
 }

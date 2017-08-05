@@ -60,6 +60,10 @@ module.exports = (options = {}) => ({
             '/api': {
                 target: 'https://api.mymoonlight.cn',
                 changeOrigin: true
+            },
+            '/img': {
+                target: 'https://api.mymoonlight.cn',
+                changeOrigin: true
             }
         },
         historyApiFallback: {

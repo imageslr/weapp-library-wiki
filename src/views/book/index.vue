@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="left-6" v-loading="loading">
+        <div class="left-6 book-detail" v-loading="loading">
             <template v-if="book">
                 <h1>{{ book.title }}</h1>
                 <div class="basic-info-wrap">
@@ -36,7 +36,7 @@
                         <div v-for="item in book.relevantBooklists" class="relevant-booklist-item">
                             <div class="relevant-book-item__img-wrap">
                                 <!-- 添加t参数以保证触发create钩子 -->
-                                <img :src="item.imageUrl" @click="$refs.qrDialog.show()"/>
+                                <img :src="item.imageUrl" @click="$refs.qrDialog.show()" />
                             </div>
                             <div @click="$refs.qrDialog.show()"><a>{{item.title}}</a></div>
                         </div>
@@ -48,11 +48,30 @@
             </div>
         </div>
         <div class="right-4">
+            <el-card style="margin-bottom: 20px;">
+                <div><small>最后编辑时间：{{book.createTime}}</small></div>
+                <div><small>编辑者：{{book.editor}}</small></div>
+                <div style="margin-bottom: 10px;"><small>编辑摘要：{{book.editSummary}}</small></div>
+                <el-button type="primary" @click="create">编辑此条目</el-button>
+            </el-card>
             <el-card>
-                <div v-if="book">
-                    <div>当前页面版本：{{book.version}}</div>
-                    <div>编辑者：{{book.editor}}</div>
-                </div>
+                <el-form label-position="top">
+                    <el-form-item label="查看历史版本" style="margin-bottom: 0px;">
+                        <el-select v-model="book.version" placeholder="请选择">
+                            <el-popover v-for="item in versions" placement="right" width="250" trigger="hover">
+                                <div>
+                                    <div>编辑时间：{{item.createTime}}</div>
+                                    <div>编辑者：{{item.editor}}</div>
+                                    <div>编辑摘要：{{item.summary}}</div>
+                                </div>
+                                <router-link slot="reference" :to="{ name: 'book', params: { id: $route.params.id }, query: {version: item.version} }">
+                                <el-option :label=" 'version: ' + item.version" :value="item.version" v-popover="'popover'+ item.version">
+                                </el-option>
+                                </router-link>
+                            </el-popover>
+                        </el-select>
+                    </el-form-item>
+                </el-form>
             </el-card>
         </div>
         <qr-dialog ref="qrDialog"></qr-dialog>
@@ -60,6 +79,7 @@
 </template>
 <script>
 import { getBookById } from '../../api/index.js';
+import { checkLogin } from '../../utils/auth.js';
 import qrDialog from '../../components/QRDialog.vue';
 
 export default {
@@ -68,7 +88,12 @@ export default {
     },
     data() {
         return {
-            book: undefined,
+            book: {
+                version: undefined,
+                createTime: undefined,
+                relevantBooks: [],
+                relevantBooklists: [],
+            },
             loading: true,
 
             basicKeys: [{
@@ -81,7 +106,7 @@ export default {
                 name: "出版社",
                 key: "publisher"
             }, {
-                name: "出版年",
+                name: "出版日期",
                 key: "pubdate"
             }, {
                 name: "语种",
@@ -118,7 +143,9 @@ export default {
             }, {
                 name: "导读",
                 key: "preview"
-            }]
+            }],
+
+            versions: [],
         }
     },
     created() {
@@ -132,93 +159,34 @@ export default {
     methods: {
         fetchData: function() {
             this.loading = true;
-            getBookById(this.$route.params.id).then(res => {
+            getBookById(this.$route.params.id, this.$route.query.version).then(res => {
                 this.book = res;
+                this.versions = res.versions;
+            }).catch((res) => {
+                if (res.code == 404)
+                    this.$router.replace({ path: '/404' });
             }).finally(() => {
                 this.loading = false;
+            });
+        },
+        create: function() {
+            if (checkLogin(this)) {
+                this.$router.push({
+                    path: '/edit',
+                    query: {
+                        id: this.book.bookId,
+                        version: this.$route.query.version
+                    }
+                });
+            }
+        },
+        navigate: function(version) {
+            this.$router.push({
+                path: '/book/',
+                params: { id: this.$route.params.id },
+                query: { version: version }
             });
         }
     }
 }
 </script>
-<style scoped>
-.basic-info-wrap {
-    overflow: hidden;
-    color: #111;
-    font-size: 14px;
-}
-
-.basic-info-picture {
-    float: left;
-    margin-right: 20px;
-}
-
-.basic-info {
-    overflow: hidden;
-}
-
-.basic-info-picture img {
-    height: 150px;
-}
-
-.basic-info__key {
-    color: #666666;
-}
-
-
-
-h1 {
-    word-wrap: break-word;
-    display: block;
-    font-size: 25px;
-    font-weight: bold;
-    color: #494949;
-    margin: 0;
-    padding: 0 0 15px 0;
-    line-height: 1.1;
-}
-
-h2 {
-    margin-top: 24px;
-    margin-bottom: 3px;
-    color: #494949;
-    line-height: 150%;
-    font-size: 20px;
-}
-
-.relevant-book {
-    overflow: hidden;
-}
-
-.relevant-book-item {
-    float: left;
-    width: 20%;
-    padding-right: 30px;
-    margin: 15px 0;
-    overflow: hidden;
-    text-align: center;
-}
-
-.relevant-book-item__img-wrap {
-    height: 130px;
-    overflow: hidden;
-}
-
-.relevant-book-item__img-wrap img {
-    max-width: 100%;
-    max-height: 100%;
-}
-
-.relevant-booklist-item {
-    float: left;
-    width: 20%;
-    padding-right: 30px;
-    margin: 15px 0;
-    overflow: hidden;
-    text-align: center;
-}
-
-.relevant-booklist-item > div {
-    cursor: pointer;
-}
-</style>

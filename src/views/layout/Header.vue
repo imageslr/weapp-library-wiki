@@ -17,8 +17,8 @@
                     <i class="el-icon-setting" style="margin-left: 5px"></i>
                     </span>
                     <el-dropdown-menu slot="dropdown">
-                        <el-dropdown-item command="changepassword">修改密码</el-dropdown-item>
-                        <el-dropdown-item command="logout" divided>退出</el-dropdown-item>
+                        <el-dropdown-item v-if="type == 1" command="changepassword">修改密码</el-dropdown-item>
+                        <el-dropdown-item command="logout" :divided="type == 1">退出</el-dropdown-item>
                     </el-dropdown-menu>
                 </el-dropdown>
                 <div v-else class="header-action__link" @click="showLogin">登录 / 注册</div>
@@ -57,22 +57,22 @@ export default {
             loginDialogVisible: false
         }
     },
+    computed: {
+        token() {
+            return this.$store.getters.token;
+        },
+        nickname() {
+            return this.$store.getters.nickname;
+        },
+        type() {
+            return this.$store.getters.type;
+        },
+    },
     watch: {
         '$route': function() {
             // 切换页面时清空输入框
             if (this.$route.path != '/search' || this.$route.query.keyword != this.inputValue)
                 this.inputValue = '';
-        }
-    },
-    computed: {
-        token(){
-            return this.$store.getters.token;
-        },
-        nickname(){
-            return this.$store.getters.nickname;
-        },
-        path() {
-            return this.$route.path.replace('/', '');
         }
     },
     methods: {
@@ -90,11 +90,16 @@ export default {
                 }
             });
         },
-        handleCommand: function(command){
-            if(command == 'logout'){
-                this.$store.dispatch('LOGOUT');
+        handleCommand: function(command) {
+            if (command == 'logout') {
+                this.$store.dispatch('LOGOUT').then(() => {
+                    // 如果在需要授权的页面，则返回到主页
+                    if (this.$route.meta.requireAuth) {
+                        this.$router.replace({ path: '/401' });
+                    }
+                });
             }
-            if(command == 'changepassword') {
+            if (command == 'changepassword') {
                 this.$refs.changePasswordDialog.show();
             }
         }

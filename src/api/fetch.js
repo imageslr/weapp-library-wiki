@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { Message } from 'element-ui';
+import store from '../store/index.js';
 
 // 创建axios实例
 const service = axios.create({
@@ -8,10 +9,9 @@ const service = axios.create({
 
 // request拦截器
 service.interceptors.request.use(config => {
-    // Do something before request is sent
-    // if (store.getters.token) {
-    //     config.headers['X-Token'] = getToken(); // 让每个请求携带token--['X-Token']为自定义key
-    // }
+      if (store.getters.token) {
+          config.headers['token'] = store.getters.token; // 让每个请求携带token
+      }
     return config;
 }, error => {
     // Do something with request error
@@ -23,7 +23,8 @@ service.interceptors.request.use(config => {
 service.interceptors.response.use(
     response => {
         const res = response.data;
-        if (res.code !== 200) {
+        if (res.code < 200 || res.code >= 300) {
+            console.log(res);
             if (res.code == 500) {
                 Message({
                     message: res.errmsg,

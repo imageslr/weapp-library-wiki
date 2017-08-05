@@ -39,6 +39,7 @@
 </template>
 <script>
 import { phoneTest, emailTest, emailValidator, passwordValidator } from '../../../utils/validate.js';
+import { register } from '../../../api/index.js';
 export default {
     data() {
         return {
@@ -56,7 +57,7 @@ export default {
                             callback(new Error('请输入正确的邮箱'));
                         } else if ((this.type == 2 || this.type == 3) && !phoneTest(value)) {
                             // callback(new Error('请输入正确的手机号'));
-                            callback();     // -> 图书馆账号中有的不是手机号，所以暂时不检测
+                            callback(); // -> 图书馆账号中有的不是手机号，所以暂时不检测
                         } else {
                             callback();
                         }
@@ -98,11 +99,11 @@ export default {
                 }],
                 confirmPassword: [{
                     required: true,
-                    trigger: 'blur',
+                    message: '请再次输入新密码',
+                    trigger: 'blur'
+                }, {
                     validator: (rule, value, callback) => {
-                        if (!value) {
-                            callback(new Error('请再次输入密码'));
-                        } else if (value != this.registerForm.password) {
+                        if (value !== this.registerForm.password) {
                             callback(new Error('两次输入密码不一致'));
                         } else {
                             callback();
@@ -162,7 +163,7 @@ export default {
         },
         toggleDialog(type) {
             this.dialogType = type;
-            this.$refs[type + 'Form'].resetFields();
+            this.$refs.registerForm.resetFields();  // 切换表单类型时，注册表单需要重置，登录表单不需要
         },
         reset() {
             if (this.loginForm.username || this.loginForm.password) {
@@ -201,6 +202,17 @@ export default {
         register() {
             this.$refs.registerForm.validate((valid) => {
                 if (!valid) return;
+
+                this.registerLoading = true;
+                register(this.registerForm).then(() => {
+                    this.$message.success('注册成功');
+                }).catch((res) => {
+                    if (res.code == 400) {
+                        this.$message.error('邮箱已被注册');
+                    }
+                }).finally(() => {
+                    this.registerLoading = false;
+                })
             });
         },
     }

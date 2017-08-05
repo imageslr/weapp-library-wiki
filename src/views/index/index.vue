@@ -167,8 +167,14 @@ export default {
         particlesJS("particles-js", this.particlesCfg);
     },
     methods: {
-        showLogin(){
-            this.$emit('showLogin')
+        showLogin() {
+            if (this.$store.getters.token) {
+                this.$alert('您已经登录', '', {
+                    confirmButtonText: '确定',
+                    type: 'success'
+                })
+            }
+            else this.$emit('showLogin')
         }
     }
 }
