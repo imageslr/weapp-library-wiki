@@ -16,7 +16,14 @@
             </template>
         </div>
         <div slot="footer" class="dialog-footer">
-            <el-button type="primary" @click="commit" :loading="btnLoading">{{text}}</el-button>
+            <el-popover ref="confirmPopover" placement="top" width="200" v-model="popoverVisible">
+                <p>您提交的版本将成为该图书的最新版本并对所有人可见，确认提交吗？</p>
+                <div style="text-align: right; margin: 0">
+                    <el-button size="mini" type="text" @click="popoverVisible = false">取消</el-button>
+                    <el-button type="text" size="mini" @click="commit">确定</el-button>
+                </div>
+            </el-popover>
+            <el-button type="primary" v-popover:confirmPopover :loading="btnLoading">{{text}}</el-button>
         </div>
     </el-dialog>
 </template>
@@ -26,6 +33,8 @@ export default {
     props: ['book'],
     data: function() {
         return {
+            popoverVisible: false,
+
             basicKeys: [{
                 name: "作者",
                 key: "author"
@@ -83,7 +92,7 @@ export default {
         imageUrl() {
             return this.book.imageUrlRaw ? this.book.imageUrlRaw : '/img/noPicture.jpg';
         },
-        text(){
+        text() {
             return this.$route.path == '/edit' ? "创建新版本" : "创建条目";
         }
     },
@@ -93,6 +102,7 @@ export default {
         },
         commit() {
             this.btnLoading = true;
+            this.popoverVisible = false;
             this.$parent.$refs.form.validate((valid) => {
                 if (!valid) {
                     this.$message.error("图书信息有误，请重新填写");
@@ -101,12 +111,10 @@ export default {
                 } else {
                     addBookItem(this.$parent.form, this.$route.query.id).then((res) => {
                         this.$message.success(this.$route.path == 'edit' ? "创建新版本成功" : "创建条目成功");
-                        this.$router.push({
+                        this.$router.replace({
                             name: 'book',
                             params: { id: res.bookId }
                         });
-                    }).catch((res) => {
-                        console.log(res.errmsg);
                     }).finally(() => {
                         this.btnLoading = false;
                     });

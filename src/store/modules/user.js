@@ -6,6 +6,7 @@ const user = {
     id: '',
     nickname: '',
     type: '',
+    isAdmin: false,
     token: getToken(),
   },
 
@@ -22,6 +23,9 @@ const user = {
     SET_TOKEN: (state, token) => {
       state.token = token;
     },
+    SET_IS_ADMIN: (state, isAdmin) => {
+      state.isAdmin = isAdmin;
+    },
   },
 
   actions: {
@@ -34,6 +38,7 @@ const user = {
           commit('SET_NICKNAME', response.nickname);
           commit('SET_TYPE', response.type);
           commit('SET_TOKEN', response.token);
+          commit('SET_IS_ADMIN', response.isAdmin);
           setToken(response.token);
           resolve();
         }).catch(error => {
@@ -49,6 +54,7 @@ const user = {
           commit('SET_ID', response.id);
           commit('SET_NICKNAME', response.nickname);
           commit('SET_TYPE', response.type);
+          commit('SET_IS_ADMIN', response.isAdmin);
           resolve();
         }).catch(error => {
           reject(error);

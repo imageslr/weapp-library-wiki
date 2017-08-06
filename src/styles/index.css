@@ -47,6 +47,9 @@ small {
     padding-left: 40px;
 }
 
+.clearfix {
+    clear: both;
+}
 
 /* 图书详情 */
 

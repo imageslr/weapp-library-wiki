@@ -9,9 +9,9 @@ const service = axios.create({
 
 // request拦截器
 service.interceptors.request.use(config => {
-      if (store.getters.token) {
-          config.headers['token'] = store.getters.token; // 让每个请求携带token
-      }
+    if (store.getters.token) {
+        config.headers['token'] = store.getters.token; // 让每个请求携带token
+    }
     return config;
 }, error => {
     // Do something with request error
@@ -25,7 +25,8 @@ service.interceptors.response.use(
         const res = response.data;
         if (res.code < 200 || res.code >= 300) {
             console.log(res);
-            if (res.code == 500) {
+            // 404直接重定向
+            if (res.code != 404) {
                 Message({
                     message: res.errmsg,
                     type: 'error',
@@ -40,11 +41,13 @@ service.interceptors.response.use(
     error => {
         console.log('err' + error); // for debug
         //console.log(error.response);
-        Message({
-            message: '网络超时',
-            type: 'error',
-            duration: 5 * 1000
-        });
+        if (error.response.status >= 500) {
+            Message({
+                message: '网络超时',
+                type: 'error',
+                duration: 5 * 1000
+            });
+        }
         return Promise.reject(error);
     }
 )

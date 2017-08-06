@@ -1,7 +1,7 @@
 <template>
-    <div>
+    <div v-loading="loading">
         <div class="left-6">
-            <el-form v-loading="formLoading" class="edit-form" :model="form" ref="form" label-position="right" label-width="100px">
+            <el-form class="edit-form" :model="form" ref="form" label-position="right" label-width="100px">
                 <el-form-item prop="imageUrl" label="图书封面">
                     <el-upload v-loading="imageLoading" class="picture-uploader" name="picture" action="/api/wiki/books/image" accept="image/jpeg, image/jpg, image/png" :show-file-list="false" :multiple="false" :before-upload="beforePictureUpload" :on-success="handlePictureSuccess" :on-error="handlePictureError" :http-request="handlePictureUpload">
                         <img v-if="form.imageUrlRaw" :src="form.imageUrlRaw" class="picture">
@@ -12,7 +12,7 @@
                 <el-form-item prop="title" label="书名" :rules="requiredValidator">
                     <el-input v-model="form.title"></el-input>
                 </el-form-item>
-                <el-form-item prop="isbn" label="ISBN" :rules="isbnValidator">
+                <el-form-item prop="isbn" label="ISBN" :rules="isEdit ? {} : isbnValidator">
                     <el-input :disabled="$route.path == '/edit'" v-model="form.isbn" placeholder="ISBN不能与系统已有记录重复"></el-input>
                 </el-form-item>
                 <el-form-item prop="callNumber" label="索书号">
@@ -57,7 +57,7 @@
                 <el-form-item prop="preview" label="试读">
                     <el-input v-model="form.preview" type="textarea" :rows="3"></el-input>
                 </el-form-item>
-                <el-form-item class="is-required" v-if="isEdit" prop="editSummary" label="编辑摘要" :rules="editSummaryValidator">
+                <el-form-item class="is-required" v-if="isEdit" prop="editSummary" label="编辑摘要" :rules="isEdit? requiredValidator : {}">
                     <el-input ref="editSummaryInput" v-model="form.editSummary" placeholder="简要描述你所作出的修改"></el-input>
                     <div>
                         <el-tag v-for="item in tags" type="primary" @click.native="selectTag(item.value)">{{item.label}}</el-tag>
@@ -73,6 +73,7 @@
                 <el-button type="primary" @click="showPreview()">预览条目</el-button>
             </el-card>
         </div>
+        <div class="clearfix"></div>
         <preview-dialog :book="form" ref="preview"></preview-dialog>
     </div>
 </template>
@@ -108,15 +109,15 @@ export default {
                 preview: undefined,
                 editSummary: ''
             },
+            loading: false,
             imageLoading: false,
-            formLoading: false,
 
             tags: [{
                 label: "修改内容",
                 value: "修改内容："
             }, {
                 label: "修正笔误",
-                value: "修正笔误；"
+                value: "修正笔误 "
             }, {
                 label: "版本回退",
                 value: "回退至早前的版本-原因："
@@ -132,11 +133,6 @@ export default {
             isbnValidator: [requiredValidator(), {
                 trigger: 'change',
                 validator: (rule, value, callback) => {
-                    // 编辑时不检测isbn
-                    if (this.isEdit) {
-                        callback();
-                    }
-
                     search({
                         type: 'isbn',
                         keyword: value
@@ -160,17 +156,6 @@ export default {
                         callback();
                     }
                 }
-            },
-            editSummaryValidator: {
-                trigger: 'change',
-                validator: (rule, value, callback) => {
-                    // 编辑时必须写编辑摘要
-                    if (this.isEdit && !value) {
-                        callback(new Error('请输入编辑摘要'));
-                    } else {
-                        callback();
-                    }
-                }
             }
         }
     },
@@ -181,6 +166,9 @@ export default {
     },
     created() {
         if (this.$route.path == '/edit') {
+            if (!this.$route.query.id)
+                this.$router.replace({ path: '/404' });
+
             this.formLoading = true;
             getBookById(this.$route.query.id, this.$route.query.version).then((res) => {
                 Object.keys(this.form).forEach(key => {
@@ -188,6 +176,10 @@ export default {
                         this.form[key] = res[key];
                 });
                 this.form.imageUrlRaw = res.imageUrl;
+            }).catch((res) => {
+                if (res.code == 404) {
+                    this.$router.replace({ path: '/404' });
+                }
             }).finally(() => {
                 this.formLoading = false
             });
@@ -285,7 +277,7 @@ export default {
             };
 
             xhr.onload = function onload() {
-                // 这里作出了修改
+                // 这里作了修改
                 if (xhr.status < 200 || xhr.status >= 300 || getBody(xhr).code != 200) {
                     return option.onError(getError(action, option, xhr));
                 }

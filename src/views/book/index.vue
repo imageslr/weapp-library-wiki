@@ -1,6 +1,6 @@
 <template>
-    <div>
-        <div class="left-6 book-detail" v-loading="loading">
+    <div v-loading="loading">
+        <div class="left-6 book-detail">
             <template v-if="book">
                 <h1>{{ book.title }}</h1>
                 <div class="basic-info-wrap">
@@ -21,12 +21,10 @@
                     <div v-else class="relevant-book">
                         <div v-for="item in book.relevantBooks" class="relevant-book-item">
                             <div class="relevant-book-item__img-wrap">
-                                <!-- 添加t参数以保证触发create钩子 -->
-                                <router-link :to="{ name: 'book', params: { id: item.bookId }, query: { t: Date.now() } }"><img :src="item.imageUrl" /></router-link>
+                                <router-link :to="{ name: 'book', params: { id: item.bookId }}"><img :src="item.imageUrl" /></router-link>
                             </div>
                             <div>
-                                <router-link :to="{ name: 'book', params: { id: item.bookId},
-                                query: {t: Date.now() } }"> {{item.title}}</router-link>
+                                <router-link :to="{ name: 'book', params: { id: item.bookId}}"> {{item.title}}</router-link>
                             </div>
                         </div>
                     </div>
@@ -35,7 +33,6 @@
                     <div v-else>
                         <div v-for="item in book.relevantBooklists" class="relevant-booklist-item">
                             <div class="relevant-book-item__img-wrap">
-                                <!-- 添加t参数以保证触发create钩子 -->
                                 <img :src="item.imageUrl" @click="$refs.qrDialog.show()" />
                             </div>
                             <div @click="$refs.qrDialog.show()"><a>{{item.title}}</a></div>
@@ -49,32 +46,38 @@
         </div>
         <div class="right-4">
             <el-card style="margin-bottom: 20px;">
-                <div><small>最后编辑时间：{{book.createTime}}</small></div>
-                <div><small>编辑者：{{book.editor}}</small></div>
-                <div style="margin-bottom: 10px;"><small>编辑摘要：{{book.editSummary}}</small></div>
-                <el-button type="primary" @click="create">编辑此条目</el-button>
-            </el-card>
-            <el-card>
-                <el-form label-position="top">
-                    <el-form-item label="查看历史版本" style="margin-bottom: 0px;">
-                        <el-select v-model="book.version" placeholder="请选择">
-                            <el-popover v-for="item in versions" placement="right" width="250" trigger="hover">
-                                <div>
-                                    <div>编辑时间：{{item.createTime}}</div>
-                                    <div>编辑者：{{item.editor}}</div>
-                                    <div>编辑摘要：{{item.summary}}</div>
-                                </div>
-                                <router-link slot="reference" :to="{ name: 'book', params: { id: $route.params.id }, query: {version: item.version} }">
-                                <el-option :label=" 'version: ' + item.version" :value="item.version" v-popover="'popover'+ item.version">
-                                </el-option>
-                                </router-link>
-                            </el-popover>
-                        </el-select>
-                    </el-form-item>
-                </el-form>
+                <template v-if="isLatestVersion">
+                    <div><small>最后编辑时间：{{book.createTime}}</small></div>
+                    <div><small>创建者：{{creator}}</small></div>
+                </template>
+                <template v-else>
+                    <div><small>编辑时间：{{book.createTime}}</small></div>
+                    <div><small>编辑者：{{book.editor}}</small></div>
+                    <div><small>编辑摘要：{{book.editSummary}}</small></div>
+                </template>
+                <el-button style="margin-top: 10px;" type="primary" @click="navigateToEdit">编辑此版本</el-button>
+                <el-button type='text' @click="historyDialogVisible = true">查看所有历史版本</el-button>
             </el-card>
         </div>
+        <div class="clearfix"></div>
         <qr-dialog ref="qrDialog"></qr-dialog>
+        <el-dialog title="所有历史版本" :visible.sync="historyDialogVisible">
+            <el-table :data="book.versions" :row-class-name="tableRowClassName" @row-click="navigateToVersion">
+                <el-table-column prop="version" label="#" width="50px">
+                </el-table-column>
+                <el-table-column prop="createTime" label="编辑时间" width="140px" show-overflow-tooltip>
+                </el-table-column>
+                <el-table-column prop="editor" label="编辑者" width="120px" show-overflow-tooltip>
+                </el-table-column>
+                <el-table-column prop="summary" label="编辑摘要" show-overflow-tooltip>
+                </el-table-column>
+                <el-table-column label="操作" width="80px">
+                    <template scope="scope">
+                        <el-button type="text" @click="navigateToVersion(scope.row)">查看</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </el-dialog>
     </div>
 </template>
 <script>
@@ -93,8 +96,10 @@ export default {
                 createTime: undefined,
                 relevantBooks: [],
                 relevantBooklists: [],
+                versions: [],
             },
             loading: true,
+            historyDialogVisible: false,
 
             basicKeys: [{
                 name: "作者",
@@ -144,9 +149,18 @@ export default {
                 name: "导读",
                 key: "preview"
             }],
-
-            versions: [],
         }
+    },
+    computed: {
+        isLatestVersion() {
+            return this.$route.query.version === undefined;
+        },
+        creator() {
+            if (!this.book.versions.length) return undefined;
+
+            return this.book.versions[this.book.versions.length - 1].editor;
+        }
+
     },
     created() {
         this.fetchData();
@@ -157,6 +171,12 @@ export default {
         }
     },
     methods: {
+        tableRowClassName: function(row, index) {
+            if (this.book.version == row.version) {
+                return 'info-row';
+            }
+            return '';
+        },
         fetchData: function() {
             this.loading = true;
             getBookById(this.$route.params.id, this.$route.query.version).then(res => {
@@ -169,7 +189,7 @@ export default {
                 this.loading = false;
             });
         },
-        create: function() {
+        navigateToEdit: function() {
             if (checkLogin(this)) {
                 this.$router.push({
                     path: '/edit',
@@ -180,13 +200,22 @@ export default {
                 });
             }
         },
-        navigate: function(version) {
+        navigateToVersion: function(row) {
             this.$router.push({
-                path: '/book/',
+                name: 'book',
                 params: { id: this.$route.params.id },
-                query: { version: version }
+                query: {version: row.version}
             });
         }
     }
 }
 </script>
+<style>
+.el-table .info-row {
+    background: #edf7ff;
+}
+
+.el-table tr:hover {
+    cursor: pointer;
+}
+</style>

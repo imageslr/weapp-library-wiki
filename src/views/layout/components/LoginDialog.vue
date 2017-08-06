@@ -190,9 +190,8 @@ export default {
                 this.$store.dispatch('LOGIN', params).then(() => {
                     this.dialogVisible = false;
                     this.$message.success('登录成功');
-                }).catch((res) => {
-                    if (res.code == 400) {
-                        this.$message.error('账号或密码错误');
+                    if(this.$route.path == '/401') {
+                        this.$router.replace({path: '/'});
                     }
                 }).finally(() => {
                     this.loginLoading = false;
@@ -206,10 +205,6 @@ export default {
                 this.registerLoading = true;
                 register(this.registerForm).then(() => {
                     this.$message.success('注册成功');
-                }).catch((res) => {
-                    if (res.code == 400) {
-                        this.$message.error('邮箱已被注册');
-                    }
                 }).finally(() => {
                     this.registerLoading = false;
                 })

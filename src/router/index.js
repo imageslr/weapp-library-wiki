@@ -25,7 +25,7 @@ export default new Router({
         children: [{
             path: '',
             component: Edit,
-            meta: { requireAuth: true },
+            meta: { requireAuth: true, redirectWhen404: true },
         }]
     }, {
         path: '/create',
@@ -37,9 +37,13 @@ export default new Router({
         }]
     }, {
         path: '/book/:id',
-        name: 'book',
         component: Layout,
-        children: [{ path: '', component: Book }]
+        children: [{
+            path: '',
+            component: Book,
+            name: 'book',
+            meta: {redirectWhen404: true}
+        }]
     }, {
         path: '/401',
         component: Layout,

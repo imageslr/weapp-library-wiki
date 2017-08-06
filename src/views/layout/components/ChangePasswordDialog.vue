@@ -84,10 +84,6 @@ export default {
                     changePassword(this.$store.getters.id, this.form.password, this.form.newPassword).then(() => {
                         this.dialogVisible = false;
                         this.$message.success('修改密码成功');
-                    }).catch((res) => {
-                        if (res.code == 400) {
-                            this.$message.error('原密码错误');
-                        }
                     }).finally(() => {
                         this.loading = false;
                     });
