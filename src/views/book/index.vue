@@ -1,6 +1,6 @@
 <template>
     <div v-loading="loading">
-        <div class="left-6 book-detail">
+        <div v-if="book.version" class="left-6 book-detail">
             <template v-if="book">
                 <h1>{{ book.title }}</h1>
                 <div class="basic-info-wrap">
@@ -44,7 +44,7 @@
                 <span class="el-table__empty-text">暂无数据</span>
             </div>
         </div>
-        <div class="right-4">
+        <div v-if="book.version" class="right-4">
             <el-card style="margin-bottom: 20px;">
                 <template v-if="isLatestVersion">
                     <div><small>最后编辑时间：{{book.createTime}}</small></div>
@@ -55,8 +55,13 @@
                     <div><small>编辑者：{{book.editor}}</small></div>
                     <div><small>编辑摘要：{{book.editSummary}}</small></div>
                 </template>
-                <el-button style="margin-top: 10px;" type="primary" @click="navigateToEdit">编辑此版本</el-button>
-                <el-button type='text' @click="historyDialogVisible = true">查看所有历史版本</el-button>
+                <el-button v-if="!book.isLocked" style="margin-top: 10px;" type="primary" @click="navigateToEdit">编辑此版本</el-button>
+                <el-button style="margin-top: 10px;" type='text' @click="historyDialogVisible = true">查看所有历史版本</el-button>
+                <el-button v-if="book.isLocked" style="margin-top: 10px;" type="text" disabled>此条目已被锁定, 无法编辑</el-button>
+            </el-card>
+            <el-card v-if="isAdmin">
+                <el-button v-if="!book.isLocked" :loading="lockLoading" type="danger" @click="lock">锁定此条目</el-button>
+                <el-button v-if="book.isLocked" :loading="unlockLoading" type="success" @click="unlock">解锁此条目</el-button>
             </el-card>
         </div>
         <div class="clearfix"></div>
@@ -81,7 +86,7 @@
     </div>
 </template>
 <script>
-import { getBookById } from '../../api/index.js';
+import { getBookById, lockBookById, unlockBookById } from '../../api/index.js';
 import { checkLogin } from '../../utils/auth.js';
 import qrDialog from '../../components/QRDialog.vue';
 
@@ -99,6 +104,8 @@ export default {
                 versions: [],
             },
             loading: true,
+            lockLoading: false,
+            unlockLoading: false,
             historyDialogVisible: false,
 
             basicKeys: [{
@@ -152,6 +159,9 @@ export default {
         }
     },
     computed: {
+        isAdmin() {
+            return this.$store.getters.isAdmin;
+        },
         isLatestVersion() {
             return this.$route.query.version === undefined;
         },
@@ -189,6 +199,34 @@ export default {
                 this.loading = false;
             });
         },
+        lock: function() {
+            this.$confirm('锁定后其他用户将无法编辑此条目', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                this.lockLoading = true;
+                lockBookById(this.$route.params.id).then(() => {
+                    this.book.isLocked = true;
+                }).finally(() => {
+                    this.lockLoading = false;
+                });
+            });
+        },
+        unlock: function() {
+            this.$confirm('解除锁定后其他用户将能够编辑此条目', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                this.unlockLoading = true;
+                unlockBookById(this.$route.params.id).then(() => {
+                    this.book.isLocked = false;
+                }).finally(() => {
+                    this.unlockLoading = false;
+                });
+            });
+        },
         navigateToEdit: function() {
             if (checkLogin(this)) {
                 this.$router.push({
@@ -204,7 +242,7 @@ export default {
             this.$router.push({
                 name: 'book',
                 params: { id: this.$route.params.id },
-                query: {version: row.version}
+                query: { version: row.version }
             });
         }
     }

@@ -1,6 +1,6 @@
 <template>
     <div v-loading="loading">
-        <div class="left-6">
+        <div v-if="isLoaded" class="left-6">
             <el-form class="edit-form" :model="form" ref="form" label-position="right" label-width="100px">
                 <el-form-item prop="imageUrl" label="图书封面">
                     <el-upload v-loading="imageLoading" class="picture-uploader" name="picture" action="/api/wiki/books/image" accept="image/jpeg, image/jpg, image/png" :show-file-list="false" :multiple="false" :before-upload="beforePictureUpload" :on-success="handlePictureSuccess" :on-error="handlePictureError" :http-request="handlePictureUpload">
@@ -65,7 +65,7 @@
                 </el-form-item>
             </el-form>
         </div>
-        <div class="right-4">
+        <div v-if="isLoaded" class="right-4">
             <el-card>
                 <div style="margin-bottom: 10px">
                     <div><small>完成编辑后请先预览，确保没有错误后再提交。</small></div>
@@ -109,6 +109,7 @@ export default {
                 preview: undefined,
                 editSummary: ''
             },
+            formRaw: {}, // 最初的数据，用于判断表单是否修改过
             loading: false,
             imageLoading: false,
 
@@ -162,6 +163,9 @@ export default {
     computed: {
         isEdit() {
             return this.$route.path == '/edit';
+        },
+        isLoaded(){
+            return !this.isEdit || this.isEdit && this.form.isbn;
         }
     },
     created() {
@@ -169,23 +173,37 @@ export default {
             if (!this.$route.query.id)
                 this.$router.replace({ path: '/404' });
 
-            this.formLoading = true;
+            this.loading = true;
             getBookById(this.$route.query.id, this.$route.query.version).then((res) => {
+                if(res.isLocked) {
+                    this.$message.error("该条目被锁定，无法编辑");
+                    return;
+                }
                 Object.keys(this.form).forEach(key => {
                     if (key != 'editSummary')
                         this.form[key] = res[key];
                 });
                 this.form.imageUrlRaw = res.imageUrl;
+                this.formRaw = Object.assign({}, this.form); // 复制初始数据，用于检测是否有修改
             }).catch((res) => {
                 if (res.code == 404) {
                     this.$router.replace({ path: '/404' });
                 }
             }).finally(() => {
-                this.formLoading = false
+                this.loading = false
             });
         }
     },
     methods: {
+        isChanged() {
+            var changed = false;
+            Object.keys(this.form).forEach(key => {
+                if(key != 'editSummary' && this.form[key] != this.formRaw[key]) {
+                    changed = true;
+                }
+            });
+            return changed;
+        },
         datePickerChange(e) {
             this.form.pubdate = formatDate(e);
         },

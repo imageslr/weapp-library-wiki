@@ -41,13 +41,11 @@ service.interceptors.response.use(
     error => {
         console.log('err' + error); // for debug
         //console.log(error.response);
-        if (error.response.status >= 500) {
-            Message({
-                message: '网络超时',
-                type: 'error',
-                duration: 5 * 1000
-            });
-        }
+        Message({
+            message: '网络超时',
+            type: 'error',
+            duration: 5 * 1000
+        });
         return Promise.reject(error);
     }
 )

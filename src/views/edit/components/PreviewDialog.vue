@@ -1,5 +1,5 @@
 <template>
-    <el-dialog class="book-detail" title="预览" :visible.sync="dialogVisible">
+    <el-dialog class="book-detail" title="预览" :visible.sync="dialogVisible" @close="popoverVisible = false">
         <h1>{{ book.title }}</h1>
         <div class="basic-info-wrap">
             <div class="basic-info-picture">
@@ -16,14 +16,14 @@
             </template>
         </div>
         <div slot="footer" class="dialog-footer">
-            <el-popover ref="confirmPopover" placement="top" width="200" v-model="popoverVisible">
+            <el-popover ref="confirmPopover" placement="top" width="200" v-model="popoverVisible" trigger="manual">
                 <p>您提交的版本将成为该图书的最新版本并对所有人可见，确认提交吗？</p>
                 <div style="text-align: right; margin: 0">
                     <el-button size="mini" type="text" @click="popoverVisible = false">取消</el-button>
                     <el-button type="text" size="mini" @click="commit">确定</el-button>
                 </div>
             </el-popover>
-            <el-button type="primary" v-popover:confirmPopover :loading="btnLoading">{{text}}</el-button>
+            <el-button type="primary" v-popover:confirmPopover :loading="btnLoading" @click="check">{{text}}</el-button>
         </div>
     </el-dialog>
 </template>
@@ -100,26 +100,36 @@ export default {
         show() {
             this.dialogVisible = true;
         },
+        check() {
+            // 如果是编辑模式，则检测数据是否有变化
+            if (this.$route.path == '/edit') {
+                if (!this.$parent.isChanged()) {
+                    return this.$message.error("您未作出任何修改");
+                }
+            }
+            this.btnLoading = true;
+            this.$parent.$refs.form.validate((valid) => {
+                this.btnLoading = false;
+                if (!valid) {
+                    this.$message.error("图书信息有误，请重新填写");
+                    return;
+                } else {
+                    this.popoverVisible = true;
+                }
+            });
+        },
         commit() {
             this.btnLoading = true;
             this.popoverVisible = false;
-            this.$parent.$refs.form.validate((valid) => {
-                if (!valid) {
-                    this.$message.error("图书信息有误，请重新填写");
-                    this.btnLoading = false;
-                    return;
-                } else {
-                    addBookItem(this.$parent.form, this.$route.query.id).then((res) => {
-                        this.$message.success(this.$route.path == 'edit' ? "创建新版本成功" : "创建条目成功");
-                        this.$router.replace({
-                            name: 'book',
-                            params: { id: res.bookId }
-                        });
-                    }).finally(() => {
-                        this.btnLoading = false;
-                    });
-                }
-            })
+            addBookItem(this.$parent.form, this.$route.query.id).then((res) => {
+                this.$message.success(this.$route.path == '/edit' ? "创建新版本成功" : "创建条目成功");
+                this.$router.replace({
+                    name: 'book',
+                    params: { id: res.bookId }
+                });
+            }).finally(() => {
+                this.btnLoading = false;
+            });
         }
     }
 }

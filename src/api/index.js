@@ -42,3 +42,11 @@ export function addBookItem(params, id = null) {
     let url = id ? '/api/wiki/books/' + id : '/api/wiki/books';
     return fetch.post(url, params);
 }
+
+export function lockBookById(id) {
+    return fetch.post('/api/wiki/books/' + id + '/lock');
+}
+
+export function unlockBookById(id) {
+    return fetch.post('/api/wiki/books/' + id + '/unlock');
+}
