@@ -2,7 +2,7 @@ const resolve = require('path').resolve
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const url = require('url')
-const publicPath = './'
+const publicPath = ''
 
 module.exports = (options = {}) => ({
     entry: {
@@ -21,8 +21,8 @@ module.exports = (options = {}) => ({
             use: ['vue-loader']
         }, {
             test: /\.js$/,
-            use: ['babel-loader'],
-            exclude: /node_modules/
+            loader: 'babel-loader',
+            exclude: /node_modules/,
         }, {
             test: /\.css$/,
             use: ['style-loader', 'css-loader', 'postcss-loader']

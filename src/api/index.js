@@ -1,5 +1,4 @@
-import fetch from './fetch';
-
+import fetch from './fetch.js';
 
 export function register(params) {
     return fetch.post('/api/wiki/users', params);
