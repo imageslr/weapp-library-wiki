@@ -164,7 +164,7 @@ export default {
         isEdit() {
             return this.$route.path == '/edit';
         },
-        isLoaded(){
+        isLoaded() {
             return !this.isEdit || this.isEdit && this.form.isbn;
         }
     },
@@ -175,7 +175,7 @@ export default {
 
             this.loading = true;
             getBookById(this.$route.query.id, this.$route.query.version).then((res) => {
-                if(res.isLocked) {
+                if (res.isLocked) {
                     this.$message.error("该条目被锁定，无法编辑");
                     return;
                 }
@@ -198,7 +198,7 @@ export default {
         isChanged() {
             var changed = false;
             Object.keys(this.form).forEach(key => {
-                if(key != 'editSummary' && this.form[key] != this.formRaw[key]) {
+                if (key != 'editSummary' && this.form[key] != this.formRaw[key]) {
                     changed = true;
                 }
             });
@@ -208,6 +208,8 @@ export default {
             this.form.pubdate = formatDate(e);
         },
         selectTag(value) {
+            if (this.form.editSummary.length > 0 && this.form.editSummary[this.form.editSummary.length - 1] != ' ')
+                this.form.editSummary += ' ';
             this.form.editSummary += value;
             this.$refs.editSummaryInput.$el.children[0].focus(); // 获取焦点
         },
@@ -231,9 +233,8 @@ export default {
                 return false;
             }
         },
+        // 重写自定义上传方法
         handlePictureUpload(option) {
-            // 重写自定义上传方法
-
             var getError = function(action, option, xhr) {
                 let msg;
                 if (xhr.response) {

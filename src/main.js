@@ -24,10 +24,10 @@ router.beforeEach((to, from, next) => {
             next();
         }
     } else {
-        if(to.matched.some(record => record.meta.requireAuth)) {
-            next({path: '/401'});
-        }
-        else next();
+        if (to.matched.some(record => record.meta.requireAuth)) {
+            next({ path: '/401' });
+            NProgress.done(); // 在hash模式下 改变手动改变hash 重定向回来 不会触发afterEach 暂时hack方案 ps：history模式下无问题
+        } else next();
     }
 });
 
