@@ -15,10 +15,10 @@ export function removeToken() {
   return Cookies.remove(TokenKey);
 }
 
-export function checkLogin(vueInstance){
+export function checkLogin(){
     if(getToken()) return true;
     else {
-        vueInstance.$emit('showLogin');
+        this.$emit('showLogin');
         return false;
     } 
 }

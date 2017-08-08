@@ -94,7 +94,7 @@ export default {
             })
         },
         create: function(){
-            if(checkLogin(this)) {
+            if(checkLogin.call(this)) {
                 this.$router.push({path: '/create'});
             }
         }

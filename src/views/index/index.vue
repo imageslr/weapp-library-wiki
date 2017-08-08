@@ -168,13 +168,9 @@ export default {
     },
     methods: {
         showLogin() {
-            if (this.$store.getters.token) {
-                this.$alert('您已经登录', '', {
-                    confirmButtonText: '确定',
-                    type: 'success'
-                })
+            if (!this.$store.getters.token) {
+                this.$emit('showLogin')
             }
-            else this.$emit('showLogin')
         }
     }
 }

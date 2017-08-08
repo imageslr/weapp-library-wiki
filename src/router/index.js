@@ -1,62 +1,56 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import Index from '../views/index/index.vue';
-import Search from '../views/search/index.vue';
-import Book from '../views/book/index.vue';
-import Edit from '../views/edit/index.vue';
-import Layout from '../views/layout/Layout.vue';
-import Error401 from '../views/error/401.vue';
-import Error404 from '../views/error/404.vue';
+
 
 Vue.use(Router);
 
 export default new Router({
     routes: [{
         path: '/',
-        component: Layout,
-        children: [{ path: '', component: Index }]
+        component: resolve => require(['../views/layout/Layout.vue'], resolve),
+        children: [{ path: '', component: resolve => require(['../views/index/index.vue'], resolve) }]
     }, {
         path: '/search',
-        component: Layout,
-        children: [{ path: '', component: Search }]
+        component: resolve => require(['../views/layout/Layout.vue'], resolve),
+        children: [{ path: '', component: resolve => require(['../views/search/index.vue'], resolve) }]
     }, {
         path: '/edit',
-        component: Layout,
+        component: resolve => require(['../views/layout/Layout.vue'], resolve),
         children: [{
             path: '',
-            component: Edit,
+            component: resolve => require(['../views/edit/index.vue'], resolve),
             meta: { requireAuth: true, redirectWhen404: true },
         }]
     }, {
         path: '/create',
-        component: Layout,
+        component: resolve => require(['../views/layout/Layout.vue'], resolve),
         children: [{
             path: '',
-            component: Edit,
+            component: resolve => require(['../views/edit/index.vue'], resolve),
             meta: { requireAuth: true },
         }]
     }, {
         path: '/book/:id',
-        component: Layout,
+        component: resolve => require(['../views/layout/Layout.vue'], resolve),
         children: [{
             path: '',
-            component: Book,
+            component: resolve => require(['../views/book/index.vue'], resolve),
             name: 'book',
-            meta: {redirectWhen404: true}
+            meta: { redirectWhen404: true }
         }]
     }, {
         path: '/401',
-        component: Layout,
+        component: resolve => require(['../views/layout/Layout.vue'], resolve),
         children: [{
             path: '',
-            component: Error401
+            component: resolve => require(['../views/error/401.vue'], resolve)
         }]
     }, {
         path: '/404',
-        component: Layout,
+        component: resolve => require(['../views/layout/Layout.vue'], resolve),
         children: [{
             path: '',
-            component: Error404
+            component: resolve => require(['../views/error/404.vue'], resolve)
         }]
     }, {
         path: '*',

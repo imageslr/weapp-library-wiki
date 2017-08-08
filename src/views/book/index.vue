@@ -67,7 +67,7 @@
         <div class="clearfix"></div>
         <qr-dialog ref="qrDialog"></qr-dialog>
         <el-dialog title="所有历史版本" :visible.sync="historyDialogVisible">
-            <el-table :data="book.versions" :row-class-name="tableRowClassName" @row-click="navigateToVersion">
+            <el-table class="version-table" :data="book.versions" :row-class-name="tableRowClassName" @row-click="navigateToVersion">
                 <el-table-column prop="version" label="#" width="50px">
                 </el-table-column>
                 <el-table-column prop="createTime" label="编辑时间" width="140px" show-overflow-tooltip>
@@ -228,7 +228,7 @@ export default {
             });
         },
         navigateToEdit: function() {
-            if (checkLogin(this)) {
+            if (checkLogin.call(this)) {
                 this.$router.push({
                     path: '/edit',
                     query: {
@@ -253,7 +253,7 @@ export default {
     background: #edf7ff;
 }
 
-.el-table tr:hover {
+.version-table.el-table tr:hover {
     cursor: pointer;
 }
 </style>

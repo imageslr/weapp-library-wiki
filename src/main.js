@@ -17,10 +17,13 @@ router.beforeEach((to, from, next) => {
     if (store.getters.token) {
         // 如果没有获取用户信息，则获取用户信息
         if (store.getters.id == '') {
-            store.dispatch('GET_INFO').finally(() => {
+            store.dispatch('GET_INFO').then(() => {
                 next();
+            }).catch(()=>{
+                ElementUI.Message.error("获取用户信息失败，请刷新重试");
             });
         } else {
+            NProgress.done();
             next();
         }
     } else {
