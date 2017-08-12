@@ -27,13 +27,7 @@ const user = {
             state.isAdmin = isAdmin;
         },
         LOG_OUT: (state) => {
-            state = {
-                id: '',
-                nickname: '',
-                type: '',
-                isAdmin: false,
-                token: ""
-            }
+            state.token = '';
         }
     },
 

@@ -19,8 +19,9 @@ router.beforeEach((to, from, next) => {
         if (store.getters.id == '') {
             store.dispatch('GET_INFO').then(() => {
                 next();
-            }).catch(()=>{
+            }).catch(() => {
                 ElementUI.Message.error("获取用户信息失败，请刷新重试");
+                NProgress.done();
             });
         } else {
             NProgress.done();
