@@ -62,6 +62,7 @@
             <el-card v-if="isAdmin">
                 <el-button v-if="!book.isLocked" :loading="lockLoading" type="danger" @click="lock">锁定此条目</el-button>
                 <el-button v-if="book.isLocked" :loading="unlockLoading" type="success" @click="unlock">解锁此条目</el-button>
+                <el-button :loading="deleteLoading" :plain="true" type="danger" @click="deleteBook">删除此条目</el-button>
             </el-card>
         </div>
         <div class="clearfix"></div>
@@ -86,7 +87,7 @@
     </div>
 </template>
 <script>
-import { getBookById, lockBookById, unlockBookById } from '../../api/index.js';
+import { getBookById, lockBookById, unlockBookById, deleteBookById } from '../../api/index.js';
 import { checkLogin } from '../../utils/auth.js';
 import qrDialog from '../../components/QRDialog.vue';
 
@@ -106,6 +107,7 @@ export default {
             loading: true,
             lockLoading: false,
             unlockLoading: false,
+            deleteLoading: false,
             historyDialogVisible: false,
 
             basicKeys: [{
@@ -224,6 +226,20 @@ export default {
                     this.book.isLocked = false;
                 }).finally(() => {
                     this.unlockLoading = false;
+                });
+            });
+        },
+        deleteBook: function() {
+            this.$confirm('确定删除此图书吗？删除后将不可恢复！', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'error'
+            }).then(() => {
+                this.deleteLoading = true;
+                deleteBookById(this.$route.params.id).then(() => {
+                    this.$message.success("删除成功，再次刷新此页面将被重定向至404")
+                }).finally(() => {
+                    this.deleteLoading = false;
                 });
             });
         },
