@@ -6,13 +6,15 @@
                 <router-view :key="$route.fullPath" v-on:showLogin="$refs.header.showLogin()"></router-view>
             </div>
         </transition>
+        <feedback v-on:showLogin="$refs.header.showLogin()"></feedback>
     </div>
 </template>
 <script>
 import AppHead from './Header.vue';
+import feedback from '../../components/Feedback.vue';
 export default {
     components: {
-        AppHead
+        AppHead, feedback
     }
 }
 </script>
