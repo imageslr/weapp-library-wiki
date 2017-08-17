@@ -101,12 +101,6 @@ export default {
             this.dialogVisible = true;
         },
         check() {
-            // 如果是编辑模式，则检测数据是否有变化
-            if (this.$route.path == '/edit') {
-                if (!this.$parent.isChanged()) {
-                    return this.$message.error("您未作出任何修改");
-                }
-            }
             this.btnLoading = true;
             this.$parent.$refs.form.validate((valid) => {
                 this.btnLoading = false;

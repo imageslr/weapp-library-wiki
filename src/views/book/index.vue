@@ -60,8 +60,9 @@
                 <el-button v-if="book.isLocked" style="margin-top: 10px;" type="text" disabled>此条目已被锁定, 无法编辑</el-button>
             </el-card>
             <el-card v-if="isAdmin">
-                <el-button v-if="!book.isLocked" :loading="lockLoading" type="danger" @click="lock">锁定此条目</el-button>
-                <el-button v-if="book.isLocked" :loading="unlockLoading" type="success" @click="unlock">解锁此条目</el-button>
+                <el-button v-if="!book.isLocked && !$route.query.version" :loading="lockLoading" type="danger" @click="lock">锁定此条目</el-button>
+                <el-button v-if="book.isLocked && !$route.query.version" :loading="unlockLoading" type="success" @click="unlock">解锁此条目</el-button>
+                <el-button v-if="$route.query.version" :loading="deleteVersionLoading" :plain="true" type="danger" @click="deleteVersion">删除此版本</el-button>
                 <el-button :loading="deleteLoading" :plain="true" type="danger" @click="deleteBook">删除此条目</el-button>
             </el-card>
         </div>
@@ -108,6 +109,7 @@ export default {
             lockLoading: false,
             unlockLoading: false,
             deleteLoading: false,
+            deleteVersionLoading: false,
             historyDialogVisible: false,
 
             basicKeys: [{
@@ -230,7 +232,7 @@ export default {
             });
         },
         deleteBook: function() {
-            this.$confirm('确定删除此图书吗？删除后将不可恢复！', '提示', {
+            this.$confirm('此条目的所有版本都将被删除且不可恢复！确定吗？', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'error'
@@ -240,6 +242,20 @@ export default {
                     this.$message.success("删除成功，再次刷新此页面将被重定向至404")
                 }).finally(() => {
                     this.deleteLoading = false;
+                });
+            });
+        },
+        deleteVersion: function() {
+            this.$confirm('确定删除此版本？', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'error'
+            }).then(() => {
+                this.deleteVersionLoading = true;
+                deleteBookById(this.$route.params.id, this.$route.query.version).then(() => {
+                    this.$message.success("删除成功")
+                }).finally(() => {
+                    this.deleteVersionLoading = false;
                 });
             });
         },

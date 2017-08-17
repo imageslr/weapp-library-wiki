@@ -46,8 +46,12 @@ export function lockBookById(id) {
     return fetch.post('/api/wiki/books/' + id + '/lock');
 }
 
-export function deleteBookById(id) {
-    return fetch.delete('/api/wiki/books/' + id);
+export function deleteBookById(id, version = undefined) {
+    if (version) {
+        return fetch.delete('/api/wiki/books/' + id + '/versions/' + version);
+    } else {
+        return fetch.delete('/api/wiki/books/' + id);
+    }
 }
 
 export function unlockBookById(id) {

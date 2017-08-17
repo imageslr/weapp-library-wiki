@@ -7,7 +7,7 @@
                         <el-input v-model="form.title" placeholder="请简要描述您遇到的问题"></el-input>
                     </el-form-item>
                     <el-form-item prop="body" label="正文">
-                        <el-input type="textarea" :rows="5" placeholder="请详细描述您遇到的问题，如：页面内容有误/违反规定，页面卡顿等。我们会在第一时间为您解决。" v-model="form.body" @keyup.enter.native="submit()"></el-input>
+                        <el-input type="textarea" :rows="5" :placeholder="bodyPlaceholder" v-model="form.body"></el-input>
                     </el-form-item>
                 </el-form>
             </div>
@@ -39,6 +39,15 @@ export default {
                 title: { required: true, trigger: 'blur', message: "请填写标题" },
                 body: { required: true, trigger: 'blur', message: "请详细描述您遇到的问题" }
             }
+        }
+    },
+    computed: {
+        bodyPlaceholder(){
+            var str = "请详细描述您遇到的问题，我们会在第一时间为您解决。";
+            if(this.$route.name == 'book') {
+                str += "如果您发现页面内容有误或违反相关规定，请附上图书编号：" + this.$route.params.id + " 帮助我们更快地定位问题。"
+            }
+            return str;
         }
     },
     methods: {
@@ -93,12 +102,11 @@ export default {
     padding: 10px;
     border: 0;
     border-radius: 25px;
-    box-shadow: 2px 2px 10px 2px rgba(44, 44, 44, .5);
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .12), 0 0 6px 0 rgba(0, 0, 0, .04);
 }
 
 .feedback:hover {
     background-color: rgba(234, 53, 74, .9);
-    box-shadow: 2px 2px 10px 2px rgba(99, 99, 99, .5);
 }
 
 .feedback:active {
