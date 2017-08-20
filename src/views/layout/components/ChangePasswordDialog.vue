@@ -5,7 +5,7 @@
                 <el-input type="password" v-model="form.password"></el-input>
             </el-form-item>
             <el-form-item label="新密码" prop="newPassword">
-                <el-input type="password" v-model="form.newPassword" auto-complete="off" placeholder="长度6~25位"</el-input>
+                <el-input type="password" v-model="form.newPassword" auto-complete="off" placeholder="长度6~25位"></el-input>
             </el-form-item>
             <el-form-item label="确认新密码" prop="confirmPassword">
                 <el-input type="password" v-model="form.confirmPassword" auto-complete="off"></el-input>
