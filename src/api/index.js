@@ -12,6 +12,10 @@ export function login(username, password, type) {
     });
 }
 
+export function sendEmail(email) {
+    return fetch.post('/api/wiki/users/password/forgot', {email});
+}
+
 export function getUserInfo(token) {
     return fetch.get('/api/wiki/users/info', {
         params: { token }
